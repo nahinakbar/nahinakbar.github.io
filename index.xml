@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nahin on Nahin</title>
+    <link>https://nahinakbar.github.io/</link>
+    <description>Recent content in Nahin on Nahin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 27 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>unnatidairy.com</title>
+      <link>https://nahinakbar.github.io/project/unnatidairy/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/unnatidairy/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kboxmini.com</title>
+      <link>https://nahinakbar.github.io/project/kboxmini/</link>
+      <pubDate>Mon, 27 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/kboxmini/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DrugsWiki Bangladesh</title>
+      <link>https://nahinakbar.github.io/project/drugs-wiki/</link>
+      <pubDate>Sat, 27 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/drugs-wiki/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>How to style using SASS: Setting up workflow</title>
+      <link>https://nahinakbar.github.io/post/how-to-style-using-sass-setting-up-workflow/</link>
+      <pubDate>Sat, 26 Jan 2019 06:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/post/how-to-style-using-sass-setting-up-workflow/</guid>
+      <description>&lt;p&gt;CSS is for styling HTML/XML documents. Sometimes writting CSS rules over and over again may become boring and time consuming. Small change in an element can make you edit a lot of lines. This is where SASS comes handy. SASS is called CSS with superpowers, As it gives CSS the power of programming the workflow.&lt;/p&gt;
+
+&lt;p&gt;In Sass you have all the goodies of CSS plus few functions on top of it. It&amp;rsquo;s easy to learn and extends CSS.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s talk about how you can get on with your Sass journey by setting up the workflow:
+In this tutorial, we will use a build automation tool called gulp. Gulp helps automate the tasks. So, what will Gulp do here? With gulp script we can watch the files and automatically trigger Sass compiling process and refresh the browser on each change on the files.&lt;/p&gt;
+
+&lt;p&gt;Now, I am not gonna talk about nitty-gritty of a Gulp config file. You can read Gulp documentation to learn a lot about it. I am just giving you a simple sass starter script. You may customize it as you use it for development tasks.&lt;/p&gt;
+
+&lt;p&gt;First, we create our project directory and initialize a npm package on it.
+&lt;code&gt;$ npm init -y&lt;/code&gt;
+This will quickly create a package.json file which is needed for installing packages.&lt;/p&gt;
+
+&lt;p&gt;We now install necessary npm dependencies for this starter script.
+&lt;code&gt;$ npm i gulp gulp-sass gulp-postcss gulp-sourcemaps autoprefixer browser-sync&lt;/code&gt;
+Then create a gulp config in a file named Gulpfile.js :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&#39;use strict&#39;;
+
+let gulp = require(&#39;gulp&#39;);
+let postcss = require(&#39;gulp-postcss&#39;);
+let autoprefixer = require(&#39;autoprefixer&#39;);
+let sass = require(&#39;gulp-sass&#39;);
+let sourcemaps = require(&#39;gulp-sourcemaps&#39;);
+let browserSync = require(&#39;browser-sync&#39;).create();
+
+let config = {
+    paths: {
+        src:  &#39;.&#39;
+    }
+};
+
+// CSS
+gulp.task(&#39;sass&#39;, function () {
+    return gulp.src(config.paths.src + &#39;/assets/scss/main.scss&#39;)
+        .pipe(sass().on(&#39;error&#39;, sass.logError))
+        .pipe(postcss([ autoprefixer({ browsers: [
+          &#39;Chrome &amp;gt;= 35&#39;,
+          &#39;Firefox &amp;gt;= 38&#39;,
+          &#39;Edge &amp;gt;= 12&#39;,
+          &#39;Explorer &amp;gt;= 10&#39;,
+          &#39;iOS &amp;gt;= 8&#39;,
+          &#39;Safari &amp;gt;= 8&#39;,
+          &#39;Android 2.3&#39;,
+          &#39;Android &amp;gt;= 4&#39;,
+          &#39;Opera &amp;gt;= 12&#39;]})]))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(config.paths.src + &#39;/assets/css&#39;))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
+        .pipe(gulp.dest(config.paths.src + &#39;/assets/css&#39;));
+});
+
+gulp.task(&#39;sass:watch&#39;, function (done) {
+    gulp.watch(config.paths.src + &#39;/assets/scss/**/*.scss&#39;, gulp.series(&#39;sass&#39;));
+    done();
+});
+
+gulp.task(&#39;files:watch&#39;, function (done) {
+    gulp.watch(config.paths.src + &#39;/*.html&#39;).on(&#39;change&#39;, browserSync.reload);
+    done();
+});
+
+// Live-reload
+gulp.task(&#39;browserSync&#39;, function () {
+    browserSync.init({
+        server: {
+            baseDir: config.paths.src
+        },
+    });
+});
+
+gulp.task(&#39;watch&#39;,
+            gulp.parallel(&#39;sass:watch&#39;, &#39;files:watch&#39;));
+
+gulp.task(&#39;serve&#39;,
+            gulp.series(&#39;sass&#39;,
+            gulp.parallel(&#39;watch&#39;, &#39;browserSync&#39;)));
+
+gulp.task(&#39;default&#39;,
+            gulp.series(&#39;serve&#39;));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now, set up directory structure:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.
++-- assets
+|   +-- css
+|   +-- scss
+|       +-- main.scss
++-- index.html
++-- Gulpfile.js
++-- packages.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The above show the directory structure for your Sass project.
+Finally add command &lt;code&gt;gulp&lt;/code&gt; as a start script on the &lt;code&gt;package.json&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;scripts&amp;quot;: {
+    &amp;quot;start&amp;quot;: &amp;quot;gulp&amp;quot;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For those who don&amp;rsquo;t want to go through the setup manually, I have created a &lt;a href=&#34;https://github.com/nahinakbar/sass-starter&#34; target=&#34;_blank&#34;&gt;GitHub repo&lt;/a&gt; for starting a Sass project.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Diaper Dawgs</title>
+      <link>https://nahinakbar.github.io/project/diaperdawgs/</link>
+      <pubDate>Wed, 27 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/diaperdawgs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AAA Office Cleaning</title>
+      <link>https://nahinakbar.github.io/project/aaaofficecleaning/</link>
+      <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/aaaofficecleaning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Phillip Journeay</title>
+      <link>https://nahinakbar.github.io/project/artist-phillip/</link>
+      <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://nahinakbar.github.io/project/artist-phillip/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
